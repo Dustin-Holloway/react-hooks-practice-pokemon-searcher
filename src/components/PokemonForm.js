@@ -1,6 +1,5 @@
 import React from "react";
 import { Form } from "semantic-ui-react";
-import { useState } from "react";
 
 function PokemonForm({ addPokemon }) {
   const pokemonObj = {
@@ -8,7 +7,6 @@ function PokemonForm({ addPokemon }) {
     name: "",
     sprites: { front: " ", back: " " },
   };
-  const [newPokemon, setNewPokemon] = useState(pokemonObj);
 
   return (
     <div>

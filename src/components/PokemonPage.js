@@ -6,15 +6,16 @@ import { Container } from "semantic-ui-react";
 import { useState, useEffect } from "react";
 
 function PokemonPage() {
+  const [defaultCollection, setDefaultCollection] = useState([]);
   const [pokemonCollection, setPokemonCollection] = useState([]);
-  const [defaultState, setDefaultState] = useState([]);
-  console.log(pokemonCollection);
+  // const [inputItems, setInputItems] = useState();
+
   useEffect(() => {
     fetch("http://localhost:3001/pokemon")
       .then((res) => res.json())
       .then((data) => {
         setPokemonCollection(data);
-        setDefaultState(data);
+        setDefaultCollection(data);
       });
   }, []);
 
@@ -23,23 +24,34 @@ function PokemonPage() {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify(pokemonObj),
-    });
-    setPokemonCollection([...pokemonCollection, pokemonObj]);
+    })
+      .then((res) => res.json())
+      .then((data) => setPokemonCollection([...pokemonCollection, data]));
   }
 
-  function rerenderDefault() {
-    setPokemonCollection(defaultState);
+  function handleChange(e) {
+    setPokemonCollection(defaultCollection);
+    const value = e.target.value;
+    updateDisplayItems(value);
   }
 
-  function updateDisplayItems(inputItems) {
-    const searchValues = pokemonCollection.filter((item) =>
-      item.name.toLowerCase().includes(inputItems.toLowerCase())
-    );
-    inputItems === ""
-      ? setPokemonCollection(defaultState)
-      : setPokemonCollection(searchValues);
+  function updateDisplayItems(value) {
+    if (value === "") {
+      setPokemonCollection([...defaultCollection]);
+    } else if (value.length < pokemonCollection.length) {
+      setPokemonCollection(
+        defaultCollection.filter((item) =>
+          item.name.toLowerCase().includes(value.toLowerCase())
+        )
+      );
+    } else {
+      setPokemonCollection(
+        defaultCollection.filter((item) =>
+          item.name.toLowerCase().includes(value.toLowerCase())
+        )
+      );
+    }
   }
-
   return (
     <Container>
       <h1>Pokemon Searcher</h1>
@@ -48,7 +60,7 @@ function PokemonPage() {
       <br />
       <Search
         updateDisplayItems={updateDisplayItems}
-        rerenderDefault={rerenderDefault}
+        handleChange={handleChange}
       />
       <br />
       <PokemonCollection pokemon={pokemonCollection} />
